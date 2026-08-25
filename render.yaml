@@ -1,0 +1,38 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# A persistent disk is required: the guest list and the couple's photo live in a
+# SQLite file, and Render's filesystem is otherwise wiped on every deploy.
+# Disks are only available on paid instance types, so `plan: free` will not work.
+services:
+  - type: web
+    name: seat-finder
+    runtime: node
+    plan: starter
+    region: oregon
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+
+    # A service with a disk cannot run more than one instance, which is exactly
+    # what we want: one process owning one SQLite file.
+    numInstances: 1
+
+    disk:
+      name: seatfinder-data
+      mountPath: /var/data
+      sizeGB: 1
+
+    envVars:
+      - key: NODE_VERSION
+        value: 22.11.0
+
+      - key: DATABASE_PATH
+        value: /var/data/seatfinder.db
+
+      # Render generates a strong random value and keeps it stable across deploys.
+      - key: SESSION_SECRET
+        generateValue: true
+
+      # Prompted for on first deploy, never stored in this file.
+      - key: ADMIN_PASSWORD
+        sync: false

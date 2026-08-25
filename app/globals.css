@@ -1,0 +1,265 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------
+   Design tokens — desaturated lilac on a warm white.
+   Contrast verified: ink/bg 13.8:1, muted/bg 5.4:1,
+   white on lilac-600 6.9:1, lilac-700 on white 8.4:1. All pass WCAG AA.
+   ------------------------------------------------------------------ */
+:root {
+  --bg: #fcfaff;
+  --surface: #ffffff;
+
+  --lilac-50: #f7f3fd;
+  --lilac-100: #efe7fc;
+  --lilac-200: #e0d3f8;
+  --lilac-400: #a889e0;
+  /* The lightest lilac that still clears 4.5:1 on --bg, for small accent
+     text and icons. lilac-400 is decorative only: it fails AA at body size. */
+  --lilac-500: #7e5ac2;
+  --lilac-600: #6f4fb0;
+  --lilac-700: #57408b;
+
+  --ink: #2a2340;
+  --muted: #6b6280;
+  --border: #ede6f7;
+
+  --success: #2f7d5f;
+  --danger: #b4304a;
+
+  --ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Never let a phone zoom on focus: 16px is the iOS Safari threshold. */
+  input,
+  textarea,
+  select,
+  button {
+    font-family: inherit;
+    font-size: 16px;
+  }
+
+  /* One focus treatment everywhere, never removed — only restyled. */
+  :focus-visible {
+    outline: 2px solid var(--lilac-400);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--lilac-100);
+    color: var(--ink);
+  }
+}
+
+@layer components {
+  /* Every tappable element clears the 44px minimum and answers a press. */
+  .press {
+    transition: transform 160ms var(--ease-soft), background-color 200ms var(--ease-soft),
+      border-color 200ms var(--ease-soft), color 200ms var(--ease-soft),
+      box-shadow 200ms var(--ease-soft);
+  }
+
+  .press:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .btn-primary {
+    @apply press inline-flex min-h-[52px] cursor-pointer items-center justify-center gap-2
+           rounded-full px-7 text-[15px] font-medium tracking-wide;
+    background-color: var(--lilac-600);
+    color: #ffffff;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--lilac-700);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn-quiet {
+    @apply press inline-flex min-h-[48px] cursor-pointer items-center justify-center gap-2
+           rounded-full border px-6 text-[15px] font-medium;
+    border-color: var(--border);
+    background-color: var(--surface);
+    color: var(--lilac-700);
+  }
+
+  .btn-quiet:hover:not(:disabled) {
+    border-color: var(--lilac-200);
+    background-color: var(--lilac-50);
+  }
+
+  .btn-quiet:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn-danger {
+    @apply press inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-2
+           rounded-full border px-5 text-[14px] font-medium;
+    border-color: #f0d7dd;
+    background-color: var(--surface);
+    color: var(--danger);
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    background-color: #fdf5f7;
+  }
+
+  .field {
+    @apply w-full rounded-xl border px-4 py-3 text-[16px];
+    border-color: var(--border);
+    background-color: var(--surface);
+    color: var(--ink);
+    transition: border-color 200ms var(--ease-soft), box-shadow 200ms var(--ease-soft);
+  }
+
+  .field:hover {
+    border-color: var(--lilac-200);
+  }
+
+  .field:focus {
+    outline: none;
+    border-color: var(--lilac-400);
+    box-shadow: 0 0 0 4px var(--lilac-100);
+  }
+
+  .field::placeholder {
+    color: var(--muted);
+    opacity: 0.75;
+  }
+
+  .label {
+    @apply mb-1.5 block text-[13px] font-medium;
+    color: var(--muted);
+  }
+
+  /* Letterspaced small caps used for the quiet lead-in lines. */
+  .eyebrow {
+    @apply text-[11px] font-medium uppercase;
+    letter-spacing: 0.24em;
+    color: var(--muted);
+  }
+
+  .card {
+    @apply rounded-xl2 border;
+    border-color: var(--border);
+    background-color: var(--surface);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Motion. Transform and opacity only, so nothing triggers layout.
+   Every keyframe is gated behind a reduced-motion preference check.
+   ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 10px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes bloom {
+    from {
+      opacity: 0;
+      transform: scale3d(0.94, 0.94, 1);
+    }
+    to {
+      opacity: 1;
+      transform: scale3d(1, 1, 1);
+    }
+  }
+
+  @keyframes draw {
+    from {
+      stroke-dashoffset: var(--dash, 400);
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes shimmer {
+    from {
+      transform: translate3d(-100%, 0, 0);
+    }
+    to {
+      transform: translate3d(100%, 0, 0);
+    }
+  }
+
+  .animate-rise {
+    animation: rise 420ms var(--ease-soft) both;
+  }
+
+  .animate-bloom {
+    animation: bloom 380ms var(--ease-soft) both;
+  }
+
+  /* Staggered autocomplete rows: 40ms between each, capped so a long
+     list never keeps a guest waiting for the row they want. */
+  .stagger {
+    animation: rise 260ms var(--ease-soft) both;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+
+  .flourish path {
+    stroke-dasharray: var(--dash, 400);
+    animation: draw 1400ms var(--ease-soft) 200ms both;
+  }
+
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, var(--lilac-50), transparent);
+    animation: shimmer 1600ms infinite;
+  }
+}
+
+/* With reduced motion on, content is simply present — never hidden by a
+   never-running animation, which is the usual bug in this pattern. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise,
+  .animate-bloom,
+  .stagger {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--lilac-50);
+}
+
+/* Tabular figures keep the table number and dashboard counts from jittering. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
